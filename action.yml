@@ -1,6 +1,6 @@
 name: 'Install Theos'
 description: 'Install Theos and prepare it for building projects'
-author: 'Randomblock1'
+author: 'Randomblock1 & NyaMisty'
 inputs:
   theos-dir:
     description: 'Where to install Theos (relative to the repo workspace itself)'
@@ -37,14 +37,15 @@ runs:
     - name: get sdks
       shell: bash
       run: |
-        if [ ! -d "${{ github.workspace }}/${{ inputs.theos-dir }}/sdks" ]; then
-        cd ${{ github.workspace }}/${{ inputs.theos-dir }}/sdks
-        curl -sLO ${{ inputs.theos-sdks }}/archive/master.zip
-        TMP=$(mktemp -d)
-        7z x master.zip -o$TMP
-        mv $TMP/*-master/*.sdk $THEOS/sdks
-        rm -r master.zip $TMP
-        else echo "Theos SDKs already cached, skipping..."
+        if [ -z $(shopt -s nullglob; echo ${{ github.workspace }}/${{ inputs.theos-dir }}/sdks/*) ]; then
+          cd ${{ github.workspace }}/${{ inputs.theos-dir }}/sdks
+          curl -sLO ${{ inputs.theos-sdks }}/archive/master.zip
+          TMP=$(mktemp -d)
+          7z x master.zip -o$TMP
+          mv $TMP/*-master/*.sdk $THEOS/sdks
+          rm -r master.zip $TMP
+        else 
+          echo "Theos SDKs already cached, skipping..."
         fi
 
 branding:
